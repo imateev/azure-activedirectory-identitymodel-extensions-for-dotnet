@@ -41,7 +41,23 @@ namespace System.IdentityModel.Tokens.Jwt
         private IDictionary<string, string> _outboundAlgorithmMap = null;
         private object _outboundAlgorithmMapLock = new object();
 
-        public static IDictionary<string, string> DefaultOutboundAlgorithmMap = new Dictionary<string, string>();
+        public static IDictionary<string, string> DefaultOutboundAlgorithmMap;
+
+        static JwtHeader()
+        {
+             DefaultOutboundAlgorithmMap = new Dictionary<string, string>
+             {
+                 { SecurityAlgorithms.EcdsaSha256Signature, SecurityAlgorithms.EcdsaSha256 },
+                 { SecurityAlgorithms.EcdsaSha384Signature, SecurityAlgorithms.EcdsaSha384 },
+                 { SecurityAlgorithms.EcdsaSha512Signature, SecurityAlgorithms.EcdsaSha512 },
+                 { SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.HmacSha256 },
+                 { SecurityAlgorithms.HmacSha384Signature, SecurityAlgorithms.HmacSha384 },
+                 { SecurityAlgorithms.HmacSha512Signature, SecurityAlgorithms.HmacSha512 },
+                 { SecurityAlgorithms.RsaSha256Signature, SecurityAlgorithms.RsaSha256 },
+                 { SecurityAlgorithms.RsaSha384Signature, SecurityAlgorithms.RsaSha384 },
+                 { SecurityAlgorithms.RsaSha512Signature, SecurityAlgorithms.RsaSha512 },
+             };
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JwtHeader"/> class. Default string comparer <see cref="StringComparer.Ordinal"/>.
@@ -67,7 +83,12 @@ namespace System.IdentityModel.Tokens.Jwt
             }
             else
             {
-                this[JwtHeaderParameterNames.Alg] = signingCredentials.Algorithm;
+                string outboundAlg;
+                if (OutboundAlgorithmMap.TryGetValue(signingCredentials.Algorithm, out outboundAlg))
+                    this[JwtHeaderParameterNames.Alg] = outboundAlg;
+                else
+                    this[JwtHeaderParameterNames.Alg] = signingCredentials.Algorithm;
+
                 if (!string.IsNullOrEmpty(signingCredentials.Key.KeyId))
                     this[JwtHeaderParameterNames.Kid] = signingCredentials.Key.KeyId;
             }
