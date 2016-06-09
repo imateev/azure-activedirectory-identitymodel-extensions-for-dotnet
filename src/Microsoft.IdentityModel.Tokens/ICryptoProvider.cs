@@ -25,53 +25,34 @@
 //
 //------------------------------------------------------------------------------
 
-using System;
-using Microsoft.IdentityModel.Logging;
+using System.Security.Cryptography;
 
 namespace Microsoft.IdentityModel.Tokens
 {
     /// <summary>
-    /// Base class for Security Key.
+    /// Crypto operations
     /// </summary>
-    public abstract class SecurityKey
+    public interface ICryptoProvider
     {
-        private CryptoProviderFactory _cryptoProviderFactory = new CryptoProviderFactory(CryptoProviderFactory.Default);
+        /// <summary>
+        /// Called to determine if a cryptoType is supported.
+        /// </summary>
+        /// <param name="args">the arguments required by the cryptoType.</param>
+        /// <returns>true if supported</returns>
+        bool IsSupportedAlgorithm(params object[] args);
 
         /// <summary>
-        /// This must be overridden to get the size of this <see cref="SecurityKey"/>.
+        /// returns an object of cryptoType.
         /// </summary>
-        public abstract int KeySize { get; }
+        /// <param name="cryptoType">the crypto operator that is desired <see cref="CryptoTypes"/>.</param>
+        /// <param name="args">the arguments required by the cryptoType.</param>
+        /// <remarks>call <see cref="ICryptoProvider.Release(object)"/> when finished with the object.</remarks>
+        object Create(string cryptoType, params object[] args);
 
         /// <summary>
-        /// Gets the key id of this <see cref="SecurityKey"/>.
+        /// called to release the object returned from <see cref="ICryptoProvider.Create(string, object[])"/>
         /// </summary>
-        public string KeyId { get; set; }
-
-        /// <summary>
-        /// This must be overridden to specify whether this SecurityKey supports the algorithm.
-        /// </summary>
-        /// <param name="algorithm">The crypto algorithm to use.</param>
-        /// <returns>true if this supports the algorithm; otherwise, false.</returns>
-        public abstract bool IsSupportedAlgorithm(string algorithm);
-
-        /// <summary>
-        /// Gets or sets <see cref="Microsoft.IdentityModel.Tokens.CryptoProviderFactory"/>.
-        /// </summary>
-        public CryptoProviderFactory CryptoProviderFactory
-        {
-            get
-            {
-                return _cryptoProviderFactory;
-            }
-            set
-            {
-                if (value == null)
-                {
-                    throw LogHelper.LogArgumentNullException("value");
-                };
-
-                _cryptoProviderFactory = value;
-            }
-        }
+        /// <param name="cryptoInstance">the object returned from <see cref="ICryptoProvider.Create(string, object[])"/>.</param>
+        void Release(object cryptoInstance);
     }
 }

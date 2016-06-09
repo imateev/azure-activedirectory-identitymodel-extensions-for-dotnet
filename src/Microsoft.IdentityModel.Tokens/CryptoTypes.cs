@@ -25,53 +25,22 @@
 //
 //------------------------------------------------------------------------------
 
-using System;
-using Microsoft.IdentityModel.Logging;
-
 namespace Microsoft.IdentityModel.Tokens
 {
     /// <summary>
-    /// Base class for Security Key.
+    /// Static strings used to ask for crypto operators
     /// </summary>
-    public abstract class SecurityKey
+    static public class CryptoTypes
     {
-        private CryptoProviderFactory _cryptoProviderFactory = new CryptoProviderFactory(CryptoProviderFactory.Default);
+        /// <summary>
+        /// Constant used to ask for a <see cref="HashAlgorithm"/>
+        /// </summary>
+        public const string HashAlgorithm = "HashAlgorithm";
 
         /// <summary>
-        /// This must be overridden to get the size of this <see cref="SecurityKey"/>.
+        /// Constant to ask for a <see cref="SignatureProvider"/>
         /// </summary>
-        public abstract int KeySize { get; }
+        public const string SignatureProvider = "SignautureProvider";
 
-        /// <summary>
-        /// Gets the key id of this <see cref="SecurityKey"/>.
-        /// </summary>
-        public string KeyId { get; set; }
-
-        /// <summary>
-        /// This must be overridden to specify whether this SecurityKey supports the algorithm.
-        /// </summary>
-        /// <param name="algorithm">The crypto algorithm to use.</param>
-        /// <returns>true if this supports the algorithm; otherwise, false.</returns>
-        public abstract bool IsSupportedAlgorithm(string algorithm);
-
-        /// <summary>
-        /// Gets or sets <see cref="Microsoft.IdentityModel.Tokens.CryptoProviderFactory"/>.
-        /// </summary>
-        public CryptoProviderFactory CryptoProviderFactory
-        {
-            get
-            {
-                return _cryptoProviderFactory;
-            }
-            set
-            {
-                if (value == null)
-                {
-                    throw LogHelper.LogArgumentNullException("value");
-                };
-
-                _cryptoProviderFactory = value;
-            }
-        }
     }
 }
